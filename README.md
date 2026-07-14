@@ -13,6 +13,9 @@ $ recall "kill the port my django app is using"
   Run it? [y/n]
 ```
 
+<!-- Generate the demo GIF with `vhs demo/demo.tape`, then uncomment: -->
+<!-- ![Recall demo](demo/demo.gif) -->
+
 ## What it does today (v0.1 — Phase 1 MVP)
 
 | Feature | Command |

@@ -139,14 +139,18 @@ class Store:
         self.conn.commit()
 
     # --------------------------------------------------------------- fixes
+    @staticmethod
+    def _tokens(text: str) -> set[str]:
+        import re
+        return set(re.findall(r"[a-z0-9_\-./:]{4,}", text.lower()))
+
     def find_fix(self, error_text: str) -> sqlite3.Row | None:
-        """Naive match: look for a stored fix whose error snippet shares words
-        with the incoming error. Good enough for the MVP; semantic search
-        replaces this in Phase 2."""
-        words = [w for w in error_text.split() if len(w) > 4][:8]
+        """Token-overlap match against stored error snippets. Good enough for
+        the MVP; semantic search replaces this in Phase 2."""
+        words = self._tokens(error_text)
         best, best_score = None, 0
         for row in self.conn.execute("SELECT * FROM fixes").fetchall():
-            score = sum(1 for w in words if w in row["error_snippet"])
+            score = len(words & self._tokens(row["error_snippet"]))
             if score > best_score:
                 best, best_score = row, score
         return best if best_score >= 2 else None
